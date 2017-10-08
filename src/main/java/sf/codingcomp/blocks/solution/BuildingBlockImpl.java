@@ -6,34 +6,59 @@ import sf.codingcomp.blocks.BuildingBlock;
 
 public class BuildingBlockImpl implements BuildingBlock {
 
+	private BuildingBlock blockOver = null;
+	private BuildingBlock blockUnder = null;
+	
     @Override
     public Iterator<BuildingBlock> iterator() {
-        // TODO Auto-generated method stub
-        return null;
+        Iterator<BuildingBlock> it = new Iterator<BuildingBlock>() {
+        	private BuildingBlock currBlock;
+        	private BuildingBlock nextBlock;
+        	
+        	public boolean hasNext() {
+        		if (nextBlock != null) return true;
+        		else return false;
+        	}
+        	
+        	public BuildingBlock next() {
+        		currBlock = nextBlock;
+        		nextBlock = currBlock.findBlockOver();
+        		return currBlock;
+        	}
+        	
+        	public void remove() {
+        		BuildingBlock removeMe = currBlock;
+        		BuildingBlock prevBlock = currBlock.findBlockUnder();
+        		currBlock = null;
+        		removeMe.stackUnder(null);
+        		removeMe.stackOver(null);
+        		prevBlock.stackUnder(nextBlock);
+        		nextBlock.stackOver(prevBlock);
+        	}
+        };
+        return it;
     }
 
     @Override
     public void stackOver(BuildingBlock b) {
-        // TODO Auto-generated method stub
-        
+    	 this.blockUnder = b;
+        if (b.findBlockOver() != this) {b.stackUnder(this);}
     }
 
     @Override
     public void stackUnder(BuildingBlock b) {
-        // TODO Auto-generated method stub
+        this.blockOver = b;
+        if (b.findBlockUnder() != this) {b.stackOver(this);}
         
     }
 
     @Override
     public BuildingBlock findBlockUnder() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.blockUnder;
     }
 
     @Override
     public BuildingBlock findBlockOver() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.blockOver;
     }
-
 }
